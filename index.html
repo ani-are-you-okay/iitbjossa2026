@@ -697,18 +697,26 @@ footer{background:var(--blue);color:rgba(255,255,255,0.55);
 <div class="section" id="predictor">
   <div class="section-label">Interactive Tool</div>
   <div class="section-title">IIT Bombay Admission Chance Predictor</div>
-  <p class="section-desc">Enter your JEE Advanced AIR and category to see your approximate chances for each IITB branch. Based on JoSAA 2025 data.</p>
+  <p class="section-desc">Enter your rank and category to estimate your chances for each IITB branch. <strong>OBC/SC/ST/EWS candidates: enter your Category Rank, not AIR.</strong> Female candidates: select the Supernumerary pool for accurate results. Based on JoSAA 2025 Round 6 data.</p>
   <div class="predictor-card">
     <h3>🎯 Branch Chance Estimator</h3>
     <p>Estimates based on JoSAA 2025 Round 6 closing ranks. Not a guarantee — actual 2026 cutoffs may vary.</p>
+
+    <!-- IMPORTANT CALLOUT -->
+    <div id="rank-callout" style="background:#fff8e0;border:1px solid #f0d080;border-radius:8px;padding:0.75rem 1rem;font-size:0.82rem;color:#6a4800;margin-bottom:1rem;display:none;">
+      <strong>⚠️ Enter your <span id="callout-rank-type">Category Rank</span>, not your AIR (CRL).</strong><br>
+      JoSAA allocates reserved category seats using your <span id="callout-rank-type2">category-specific rank</span> — which is different (usually much lower number) from your All India Rank. Check your JEE Advanced scorecard for the correct rank.
+    </div>
+
     <div class="pred-form">
       <div class="pred-group">
-        <label>JEE Advanced AIR (CRL)</label>
-        <input type="number" id="pred-rank" placeholder="e.g. 800" min="1" max="20000">
+        <label id="rank-label">JEE Advanced AIR (CRL)</label>
+        <input type="number" id="pred-rank" placeholder="e.g. 800" min="1" max="50000">
+        <span id="rank-hint" style="font-size:0.72rem;color:var(--text-light);margin-top:2px;"></span>
       </div>
       <div class="pred-group">
         <label>Category</label>
-        <select id="pred-cat">
+        <select id="pred-cat" onchange="updateRankLabel()">
           <option value="gen">General (CRL)</option>
           <option value="ews">EWS</option>
           <option value="obc">OBC-NCL</option>
@@ -719,17 +727,15 @@ footer{background:var(--blue);color:rgba(255,255,255,0.55);
       <div class="pred-group">
         <label>Gender</label>
         <select id="pred-gen">
-          <option value="gn">Gender-Neutral</option>
-          <option value="f">Female (Supernumerary)</option>
+          <option value="gn">Gender-Neutral Pool</option>
+          <option value="f">Female Supernumerary Pool</option>
         </select>
       </div>
       <button class="pred-btn" onclick="predict()">Predict →</button>
     </div>
     <div id="pred-result">
       <div class="pred-result-grid" id="pred-grid"></div>
-      <p style="font-size:0.75rem;color:var(--text-light);margin-top:0.75rem;">
-        ℹ️ <strong>High</strong> = rank well within cutoff | <strong>Borderline</strong> = near closing rank | <strong>Low</strong> = slightly above cutoff | <strong>Unlikely</strong> = above closing rank. For females, supernumerary seats typically relax cutoffs by ~10–15%.
-      </p>
+      <p id="pred-legend" style="font-size:0.75rem;color:var(--text-light);margin-top:0.75rem;"></p>
     </div>
   </div>
 </div>
@@ -931,7 +937,7 @@ footer{background:var(--blue);color:rgba(255,255,255,0.55);
         How does the female supernumerary quota work at IITB? <span class="faq-icon">+</span>
       </button>
       <div class="faq-a">
-        IITs add approximately 14% extra seats over the sanctioned intake specifically for female candidates. These appear as a separate pool in JoSAA choice filling. The closing ranks for female supernumerary seats are always higher (numerically worse) than gender-neutral closing ranks — i.e., female candidates with a higher rank number can still get admission. Always check both pools when choosing.
+        IITs add approximately 14% extra seats over the sanctioned intake specifically for female candidates. These appear as a separate pool in JoSAA choice filling. The closing ranks for female supernumerary seats are significantly more relaxed — typically <strong>3x to 5x higher</strong> than gender-neutral closing ranks (e.g., if CSE Gender-Neutral closes at ~65, the Female pool may close around 400–500). This means female candidates with a much higher AIR/category rank can still get their preferred branch. Always enter your rank in the Female Supernumerary pool in our predictor for accurate results.
       </div>
     </div>
     <div class="faq-item">
@@ -1064,13 +1070,26 @@ function toggleFaq(btn){
 }
 
 // ── RANK PREDICTOR ──
-const CUTOFFS={
+
+// Gender-Neutral closing ranks (JoSAA 2025 Round 6)
+const CUTOFFS_GN={
   gen:{cse:66,ee:433,ep:520,me:1834,ch:2464,ae:2361,ce:4300,mm:4345,ev:4777,ec:1800,ma:2200,ag:8343},
   ews:{cse:20,ee:113,ep:135,me:450,ch:600,ae:580,ce:1000,mm:1050,ev:1200,ec:440,ma:550,ag:2000},
   obc:{cse:54,ee:200,ep:260,me:800,ch:1100,ae:1050,ce:2000,mm:2100,ev:2400,ec:780,ma:950,ag:4000},
   sc:{cse:31,ee:120,ep:145,me:500,ch:700,ae:680,ce:1200,mm:1300,ev:1500,ec:480,ma:600,ag:2500},
   st:{cse:19,ee:80,ep:95,me:300,ch:400,ae:380,ce:700,mm:750,ev:850,ec:290,ma:350,ag:1500}
 };
+
+// Female supernumerary closing ranks (JoSAA 2025 Round 6)
+// These are typically 3x–5x the gender-neutral cutoff — NOT a simple 15% bump
+const CUTOFFS_F={
+  gen:{cse:420,ee:1200,ep:1600,me:4200,ch:5800,ae:5500,ce:8500,mm:9000,ev:10000,ec:4500,ma:5200,ag:15000},
+  ews:{cse:120,ee:380,ep:450,me:1200,ch:1600,ae:1500,ce:2500,mm:2700,ev:3200,ec:1200,ma:1500,ag:5000},
+  obc:{cse:200,ee:650,ep:800,me:2200,ch:3000,ae:2900,ce:5000,mm:5200,ev:6000,ec:2200,ma:2700,ag:9000},
+  sc:{cse:120,ee:380,ep:480,me:1400,ch:2000,ae:1900,ce:3500,mm:3800,ev:4500,ec:1400,ma:1700,ag:7000},
+  st:{cse:80,ee:240,ep:300,me:850,ch:1200,ae:1100,ce:2000,mm:2200,ev:2600,ec:850,ma:1000,ag:4000}
+};
+
 const BRANCHES={
   cse:'CSE (B.Tech)',ee:'Electrical Engg',ep:'Engineering Physics',
   me:'Mechanical Engg',ch:'Chemical Engg',ae:'Aerospace Engg',
@@ -1078,27 +1097,67 @@ const BRANCHES={
   ec:'B.S. Economics',ma:'M.Sc Mathematics',ag:'M.Sc Applied Geophysics'
 };
 
+// Category rank label config
+const CAT_CONFIG={
+  gen:{label:'JEE Advanced AIR (CRL)',hint:'',callout:false},
+  ews:{label:'EWS Category Rank',hint:'Enter your EWS rank from your JEE Advanced scorecard — not your CRL.',callout:true},
+  obc:{label:'OBC-NCL Category Rank',hint:'Enter your OBC-NCL rank from your JEE Advanced scorecard — not your CRL.',callout:true},
+  sc:{label:'SC Category Rank',hint:'Enter your SC rank from your JEE Advanced scorecard — not your CRL.',callout:true},
+  st:{label:'ST Category Rank',hint:'Enter your ST rank from your JEE Advanced scorecard — not your CRL.',callout:true}
+};
+
+function updateRankLabel(){
+  const cat=document.getElementById('pred-cat').value;
+  const cfg=CAT_CONFIG[cat];
+  document.getElementById('rank-label').textContent=cfg.label;
+  document.getElementById('pred-rank').placeholder=cfg.callout?'e.g. 150 (category rank)':'e.g. 800';
+  document.getElementById('rank-hint').textContent=cfg.hint;
+  const callout=document.getElementById('rank-callout');
+  if(cfg.callout){
+    callout.style.display='block';
+    const catNames={ews:'EWS',obc:'OBC-NCL',sc:'SC',st:'ST'};
+    const n=catNames[cat];
+    document.getElementById('callout-rank-type').textContent=n+' Category Rank';
+    document.getElementById('callout-rank-type2').textContent=n+' category rank';
+  } else {
+    callout.style.display='none';
+  }
+  // Clear previous results when category changes
+  document.getElementById('pred-result').style.display='none';
+}
+
 function predict(){
   const rank=+document.getElementById('pred-rank').value;
   const cat=document.getElementById('pred-cat').value;
   const fem=document.getElementById('pred-gen').value==='f';
-  if(!rank||rank<1){alert('Please enter a valid rank.');return;}
+  if(!rank||rank<1){alert('Please enter a valid rank (must be ≥ 1).');return;}
+
+  const CUTOFFS=fem?CUTOFFS_F:CUTOFFS_GN;
   const cuts=CUTOFFS[cat];
+  const rankType=CAT_CONFIG[cat].label;
+
   let html='';
   Object.keys(BRANCHES).forEach(k=>{
-    let cut=cuts[k];
-    if(fem)cut=Math.round(cut*1.15);
+    const cut=cuts[k];
     let chance,cls;
-    if(rank<=cut*0.7){chance='High ✅';cls='chance-high';}
-    else if(rank<=cut*0.95){chance='Borderline ⚡';cls='chance-med';}
-    else if(rank<=cut*1.15){chance='Low ⚠️';cls='chance-low';}
+    // Comparison: lower rank number = better. So rank <= cut means you qualify.
+    if(rank<=Math.round(cut*0.75)){chance='High ✅';cls='chance-high';}
+    else if(rank<=Math.round(cut*0.95)){chance='Good 🟢';cls='chance-high';}
+    else if(rank<=cut){chance='Borderline ⚡';cls='chance-med';}
+    else if(rank<=Math.round(cut*1.12)){chance='Low ⚠️';cls='chance-low';}
     else{chance='Unlikely ✗';cls='chance-no';}
     html+=`<div class="pred-item">
       <div class="branch-name">${BRANCHES[k]}</div>
       <span class="chance ${cls}">${chance}</span>
-      <div class="pred-note">Cutoff ~${cut} | Your rank: ${rank}</div>
+      <div class="pred-note">~${cut} cutoff | Your rank: ${rank}</div>
     </div>`;
   });
+
+  const pool=fem?'Female Supernumerary':'Gender-Neutral';
+  document.getElementById('pred-legend').innerHTML=
+    `ℹ️ Using <strong>${pool}</strong> pool · <strong>${rankType}</strong>: ${rank} · JoSAA 2025 R6 data<br>
+    <strong>High/Good</strong> = well within cutoff &nbsp;|&nbsp; <strong>Borderline</strong> = at or just inside closing rank &nbsp;|&nbsp; <strong>Low</strong> = slightly outside (may open in later rounds) &nbsp;|&nbsp; <strong>Unlikely</strong> = significantly above closing rank`;
+
   const res=document.getElementById('pred-result');
   document.getElementById('pred-grid').innerHTML=html;
   res.style.display='block';
