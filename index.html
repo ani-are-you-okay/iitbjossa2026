@@ -1073,28 +1073,39 @@ function toggleFaq(btn){
 
 // Gender-Neutral closing ranks (JoSAA 2025 Round 6)
 const CUTOFFS_GN={
-  gen:{cse:66,ee:433,ep:520,me:1834,ch:2464,ae:2361,ce:4300,mm:4345,ev:4777,ec:1800,ma:2200,ag:8343},
-  ews:{cse:20,ee:113,ep:135,me:450,ch:600,ae:580,ce:1000,mm:1050,ev:1200,ec:440,ma:550,ag:2000},
-  obc:{cse:54,ee:200,ep:260,me:800,ch:1100,ae:1050,ce:2000,mm:2100,ev:2400,ec:780,ma:950,ag:4000},
-  sc:{cse:31,ee:120,ep:145,me:500,ch:700,ae:680,ce:1200,mm:1300,ev:1500,ec:480,ma:600,ag:2500},
-  st:{cse:19,ee:80,ep:95,me:300,ch:400,ae:380,ce:700,mm:750,ev:850,ec:290,ma:350,ag:1500}
+  gen:{ae:2361,ag:8343,bc:7228,ce:4250,ch:2464,cse:66,dd:841,ec:2372,ee:433,en:2584,ep:1539,ev:4777,ie:1273,ma:1067,me:1834,mm:4345},
+  ews:{ae:489,ag:1311,bc:1353,ce:725,ch:500,cse:20,dd:265,ec:554,ee:113,en:494,ep:615,ev:959,ie:222,ma:397,me:336,mm:917},
+  obc:{ae:1295,ag:4014,bc:3637,ce:1829,ch:1255,cse:54,dd:549,ec:1405,ee:339,en:1455,ep:1247,ev:2587,ie:974,ma:1018,me:946,mm:2159},
+  sc:{ae:703,ag:2370,bc:2164,ce:946,ch:735,cse:31,dd:293,ec:855,ee:163,en:841,ep:850,ev:1375,ie:692,ma:1147,me:513,mm:1345},
+  st:{ae:474,ag:1070,bc:1140,ce:290,ch:469,cse:19,dd:204,ec:828,ee:96,en:732,ep:638,ev:821,ie:289,ma:557,me:291,mm:677},
 };
 
 // Female supernumerary closing ranks (JoSAA 2025 Round 6)
-// These are typically 3x–5x the gender-neutral cutoff — NOT a simple 15% bump
 const CUTOFFS_F={
-  gen:{cse:420,ee:1200,ep:1600,me:4200,ch:5800,ae:5500,ce:8500,mm:9000,ev:10000,ec:4500,ma:5200,ag:15000},
-  ews:{cse:120,ee:380,ep:450,me:1200,ch:1600,ae:1500,ce:2500,mm:2700,ev:3200,ec:1200,ma:1500,ag:5000},
-  obc:{cse:200,ee:650,ep:800,me:2200,ch:3000,ae:2900,ce:5000,mm:5200,ev:6000,ec:2200,ma:2700,ag:9000},
-  sc:{cse:120,ee:380,ep:480,me:1400,ch:2000,ae:1900,ce:3500,mm:3800,ev:4500,ec:1400,ma:1700,ag:7000},
-  st:{cse:80,ee:240,ep:300,me:850,ch:1200,ae:1100,ce:2000,mm:2200,ev:2600,ec:850,ma:1000,ag:4000}
+  gen:{ae:5994,ag:13761,bc:10435,ce:8597,ch:5969,cse:369,dd:3274,ec:4928,ee:1914,en:6136,ep:5593,ev:8925,ie:3012,ma:3432,me:4693,mm:8075},
+  ews:{ae:1160,ag:2839,bc:2621,ce:1643,ch:1152,cse:53,dd:621,ec:978,ee:396,en:1422,ep:1172,ev:2412,ie:711,ma:1085,me:1086,mm:1782},
+  obc:{ae:3571,ag:5934,bc:6573,ce:4597,ch:3552,cse:331,dd:1545,ec:3344,ee:1117,en:3818,ep:3828,ev:5253,ie:2913,ma:4453,me:2632,mm:4903},
+  sc:{ae:1252,ag:2950,bc:719,ce:1778,ch:1242,cse:270,dd:998,ec:1565,ee:753,en:2222,ep:1213,ev:2221,ie:1172,ma:1771,me:1179,mm:2209},
+  st:{ae:684,ag:1581,bc:1540,ce:522,ch:649,cse:76,dd:248,ec:564,ee:260,en:1090,ep:642,ev:1239,ie:582,me:766,mm:1156},
 };
 
-const BRANCHES={
-  cse:'CSE (B.Tech)',ee:'Electrical Engg',ep:'Engineering Physics',
-  me:'Mechanical Engg',ch:'Chemical Engg',ae:'Aerospace Engg',
-  ce:'Civil Engg',mm:'Metallurgy & Mat. Sc.',ev:'Environmental Sci.',
-  ec:'B.S. Economics',ma:'M.Sc Mathematics',ag:'M.Sc Applied Geophysics'
+const BRANCHES = {
+  ae: "Aerospace Engineering",
+  ag: "Applied Geophysics",
+  ma: "Mathematics (BS)",
+  ch: "Chemical Engineering",
+  bc: "Chemistry (BS)",
+  ce: "Civil Engineering",
+  cse: "Computer Science and Engineering",
+  ec: "Economics (BS)",
+  ee: "Electrical Engineering",
+  dd: "Electrical Engineering (Dual Degree)",
+  en: "Energy Engineering",
+  ep: "Engineering Physics",
+  ev: "Environmental Science and Engineering",
+  ie: "Industrial Engineering & Operations Research (IEOR)",
+  me: "Mechanical Engineering",
+  mm: "Metallurgical Engineering & Materials Science"
 };
 
 // Category rank label config
